@@ -132,7 +132,17 @@ fun PlayerScreen(
         )
 
         if (!isInPipMode) {
-            if (!controlsLocked) {
+            // Tapping always toggles controlsVisible, locked or not — while locked this reveals
+            // just the lock button (see below) rather than the full control set, so there's
+            // always a way to tap your way back to the unlock button without it sitting on
+            // screen permanently.
+            if (controlsLocked) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .tapToToggle { controlsVisible = !controlsVisible },
+                )
+            } else {
                 // Full-screen gesture layer: tap toggles the controls, vertical swipes on the
                 // left half adjust brightness and on the right half adjust volume (it also draws
                 // its own transient brightness/volume indicator pills).
@@ -141,8 +151,10 @@ fun PlayerScreen(
                         .fillMaxSize()
                         .tapToToggle { controlsVisible = !controlsVisible },
                 ) {}
+            }
 
-                if (controlsVisible) {
+            if (controlsVisible) {
+                if (!controlsLocked) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         PlayerTopBar(
                             channel = state.channel,
@@ -176,18 +188,17 @@ fun PlayerScreen(
                         )
                     }
                 }
-            }
 
-            // Deliberately outside the controlsLocked/controlsVisible gating above — this is the
-            // only touch target that must always stay reachable, locked or not, so the user can
-            // always get back out of the locked state.
-            LockButton(
-                locked = controlsLocked,
-                onToggle = { controlsLocked = !controlsLocked },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 12.dp),
-            )
+                // Part of the same show/hide group as the rest of the controls above — it fades
+                // out with them on the same auto-hide timer instead of staying pinned on screen.
+                LockButton(
+                    locked = controlsLocked,
+                    onToggle = { controlsLocked = !controlsLocked },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 12.dp),
+                )
+            }
 
             AnimatedVisibility(
                 visible = showEpgGlance,
