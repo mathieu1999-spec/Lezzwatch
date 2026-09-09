@@ -18,12 +18,10 @@
     <!-- Channels -->
     <string name="channels_title">Channels</string>
     <string name="channels_search_hint">Search channels</string>
-    <string name="channels_filter_country">Country</string>
     <string name="channels_filter_genre">Genre</string>
     <string name="channels_sort">Sort</string>
     <string name="channels_empty">No channels match your filters.</string>
     <string name="channels_clear_filters">Clear filters</string>
-    <string name="channels_all_countries">All Countries</string>
     <string name="channels_all_genres">All Genres</string>
     <string name="channels_results_count">%1$d channels</string>
 
@@ -42,6 +40,8 @@
     <string name="player_back_to_channels">Back to Channels</string>
     <string name="player_no_network">No internet connection.</string>
     <string name="player_channel_list">Channel list</string>
+    <string name="player_all_channels">All Channels</string>
+    <string name="player_favorites">Favorites</string>
     <string name="player_favorite">Favorite</string>
     <string name="player_unfavorite">Unfavorite</string>
     <string name="player_cast">Cast</string>

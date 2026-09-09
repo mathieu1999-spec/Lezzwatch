@@ -42,7 +42,6 @@ fun ChannelsScreen(
     viewModel: ChannelsViewModel = viewModel(factory = ChannelsViewModel.Factory),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val allCountriesLabel = stringResource(R.string.channels_all_countries)
     val allGenresLabel = stringResource(R.string.channels_all_genres)
 
     Scaffold(
@@ -71,13 +70,6 @@ fun ChannelsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    FilterDropdownChip(
-                        label = state.filter.country ?: allCountriesLabel,
-                        selected = state.filter.country != null,
-                        options = state.availableCountries,
-                        allLabel = allCountriesLabel,
-                        onOptionSelected = viewModel::onCountrySelected,
-                    )
                     FilterDropdownChip(
                         label = state.filter.genre ?: allGenresLabel,
                         selected = state.filter.genre != null,

@@ -22,7 +22,6 @@ data class ChannelsUiState(
     val isLoaded: Boolean = false,
     val filter: ChannelFilter = ChannelFilter(),
     val channels: List<Channel> = emptyList(),
-    val availableCountries: List<String> = emptyList(),
     val availableGenres: List<String> = emptyList(),
 )
 
@@ -42,7 +41,6 @@ class ChannelsViewModel(
             isLoaded = isLoaded,
             filter = filter,
             channels = applyFilter(channels, filter),
-            availableCountries = channels.map { it.country }.distinct().sorted(),
             availableGenres = channels.map { it.genre }.distinct().sorted(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ChannelsUiState())
@@ -57,10 +55,6 @@ class ChannelsViewModel(
 
     fun onQueryChange(query: String) {
         filterState.value = filterState.value.copy(query = query)
-    }
-
-    fun onCountrySelected(country: String?) {
-        filterState.value = filterState.value.copy(country = country)
     }
 
     fun onGenreSelected(genre: String?) {
@@ -85,9 +79,6 @@ class ChannelsViewModel(
         if (filter.query.isNotBlank()) {
             val q = filter.query.trim()
             result = result.filter { it.name.contains(q, ignoreCase = true) }
-        }
-        if (filter.country != null) {
-            result = result.filter { it.country == filter.country }
         }
         if (filter.genre != null) {
             result = result.filter { it.genre == filter.genre }

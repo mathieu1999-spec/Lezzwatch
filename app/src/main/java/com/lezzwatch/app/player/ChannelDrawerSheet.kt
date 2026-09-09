@@ -72,12 +72,12 @@ fun ChannelDrawerContent(
             FilterChip(
                 selected = !favoritesOnly,
                 onClick = { favoritesOnly = false },
-                label = { Text(stringResource(R.string.channels_title)) },
+                label = { Text(stringResource(R.string.player_all_channels)) },
             )
             FilterChip(
                 selected = favoritesOnly,
                 onClick = { favoritesOnly = true },
-                label = { Text(stringResource(R.string.nav_home)) },
+                label = { Text(stringResource(R.string.player_favorites)) },
             )
         }
 

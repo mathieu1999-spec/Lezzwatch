@@ -39,7 +39,6 @@ enum class SortOption {
 /** Current filter + sort selection for the Channels screen, kept together so it's easy to persist. */
 data class ChannelFilter(
     val query: String = "",
-    val country: String? = null, // null = all countries
     val genre: String? = null, // null = all genres
     val sortOption: SortOption = SortOption.NAME_ASC,
 )

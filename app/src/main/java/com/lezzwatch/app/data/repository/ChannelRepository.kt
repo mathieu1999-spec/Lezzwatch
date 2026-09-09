@@ -57,9 +57,6 @@ class ChannelRepository(
         }
     }
 
-    fun availableCountries(): List<String> =
-        channels.value.map { it.country }.distinct().sortedWith(countryComparator())
-
     fun availableGenres(): List<String> =
         channels.value.map { it.genre }.distinct().sorted()
 
@@ -74,13 +71,4 @@ class ChannelRepository(
     suspend fun clearFavorites() = favoriteDao.clearAll()
 
     fun findById(channelId: String): Channel? = channels.value.firstOrNull { it.id == channelId }
-
-    /** Keeps "International" (the unknown-country fallback) at the end of any country list. */
-    private fun countryComparator(): Comparator<String> = Comparator { a, b ->
-        when {
-            a == Channel.UNKNOWN_COUNTRY && b != Channel.UNKNOWN_COUNTRY -> 1
-            b == Channel.UNKNOWN_COUNTRY && a != Channel.UNKNOWN_COUNTRY -> -1
-            else -> a.compareTo(b)
-        }
-    }
 }
