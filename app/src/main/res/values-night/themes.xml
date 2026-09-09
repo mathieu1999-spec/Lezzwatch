@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Same palette in night mode — Lezzwatch is dark-first, so there is nothing to flip here.
+         This file exists so the system never falls back to a stock light window background
+         during the brief pre-Compose splash moment on devices in dark mode. -->
+    <style name="Theme.Lezzwatch" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/lezzwatch_background</item>
+        <item name="android:statusBarColor">@color/lezzwatch_background</item>
+        <item name="android:navigationBarColor">@color/lezzwatch_background</item>
+    </style>
+
+    <style name="Theme.Lezzwatch.Player" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/lezzwatch_player_background</item>
+        <item name="android:statusBarColor">@color/lezzwatch_player_background</item>
+        <item name="android:navigationBarColor">@color/lezzwatch_player_background</item>
+        <item name="colorPrimary">@color/lezzwatch_accent</item>
+        <item name="colorAccent">@color/lezzwatch_accent</item>
+    </style>
+</resources>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lezzwatch</string>
+    <string name="app_tagline">Free IPTV player for Android.</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_channels">Channels</string>
+    <string name="nav_coffee">Support</string>
+
+    <!-- Home -->
+    <string name="home_title">Lezzwatch</string>
+    <string name="home_empty_title">Welcome to Lezzwatch</string>
+    <string name="home_empty_body">Browse channels and add your favorites to see them here.</string>
+    <string name="home_empty_cta">Browse Channels</string>
+    <string name="home_favorites_header">Your Favorites</string>
+
+    <!-- Channels -->
+    <string name="channels_title">Channels</string>
+    <string name="channels_search_hint">Search channels</string>
+    <string name="channels_filter_country">Country</string>
+    <string name="channels_filter_genre">Genre</string>
+    <string name="channels_sort">Sort</string>
+    <string name="channels_empty">No channels match your filters.</string>
+    <string name="channels_clear_filters">Clear filters</string>
+    <string name="channels_all_countries">All Countries</string>
+    <string name="channels_all_genres">All Genres</string>
+    <string name="channels_results_count">%1$d channels</string>
+
+    <!-- Sort options -->
+    <string name="sort_az">A–Z</string>
+    <string name="sort_za">Z–A</string>
+    <string name="sort_country">Country</string>
+    <string name="sort_genre">Genre</string>
+    <string name="sort_favorites_first">Favorites First</string>
+
+    <!-- Player -->
+    <string name="player_loading">Loading %1$s…</string>
+    <string name="player_error_title">Unable to play this channel.</string>
+    <string name="player_error_body">The stream might be offline or your connection dropped.</string>
+    <string name="player_retry">Try Again</string>
+    <string name="player_back_to_channels">Back to Channels</string>
+    <string name="player_no_network">No internet connection.</string>
+    <string name="player_channel_list">Channel list</string>
+    <string name="player_favorite">Favorite</string>
+    <string name="player_unfavorite">Unfavorite</string>
+    <string name="player_cast">Cast</string>
+    <string name="player_pip">Picture in picture</string>
+    <string name="player_cast_unavailable">Casting isn\'t available for this stream on your network right now.</string>
+    <string name="brightness_label">Brightness</string>
+    <string name="volume_label">Volume</string>
+    <string name="volume_muted">Muted</string>
+
+    <!-- Buy me a coffee -->
+    <string name="coffee_title">Support</string>
+    <string name="coffee_heading">Enjoying Lezzwatch?</string>
+    <string name="coffee_body">Lezzwatch is free to use, with no mandatory subscription. If you enjoy the app and want to help keep it free, you can support development by buying me a coffee.</string>
+    <string name="coffee_button">Buy Me a Coffee</string>
+    <string name="coffee_footnote">Totally optional — Lezzwatch works exactly the same either way. Thank you for using the app!</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_system">Match system</string>
+    <string name="settings_autoplay">Resume last channel on launch</string>
+    <string name="settings_autoplay_desc">Automatically reopen the last channel you were watching when you start Lezzwatch.</string>
+    <string name="settings_default_sort">Default sort order</string>
+    <string name="settings_clear_favorites">Clear all favorites</string>
+    <string name="settings_clear_favorites_confirm_title">Clear all favorites?</string>
+    <string name="settings_clear_favorites_confirm_body">This removes every channel from your favorites. This can\'t be undone.</string>
+    <string name="settings_about">About Lezzwatch</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- About -->
+    <string name="about_version">Version %1$s</string>
+    <string name="about_legal">Lezzwatch is only a media player. It does not host, provide, or endorse any streams in the bundled playlist — those are supplied by the app\'s developer/distributor as a preconfigured source list. Lezzwatch does not attempt to bypass geo-blocking, DRM, or authentication of any kind.</string>
+
+    <string name="cd_channel_logo">Channel logo</string>
+    <string name="cd_placeholder_logo">No logo available</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_close">Close</string>
+</resources>
