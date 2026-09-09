@@ -111,8 +111,9 @@ class PlayerViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlayerScreenState())
 
-    /** Full channel list (with live favorite flags) for the in-player channel-switcher sheet. */
-    val allChannels: StateFlow<List<Channel>> = channelRepository.channels
+    /** Channel list (with live favorite flags, hidden channels excluded) for the in-player
+     * channel-switcher sheet and the remote-style favorite up/down cycling. */
+    val allChannels: StateFlow<List<Channel>> = channelRepository.visibleChannels
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _epgGlance = MutableStateFlow<EpgGlance?>(null)

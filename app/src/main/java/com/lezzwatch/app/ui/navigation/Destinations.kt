@@ -6,4 +6,5 @@ sealed class Destination(val route: String) {
     data object Coffee : Destination("coffee")
     data object Settings : Destination("settings")
     data object About : Destination("about")
+    data object HiddenChannels : Destination("hidden_channels")
 }

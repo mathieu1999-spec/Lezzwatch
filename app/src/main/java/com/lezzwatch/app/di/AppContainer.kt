@@ -27,6 +27,7 @@ class AppContainer(context: Context) {
         ChannelRepository(
             playlistSource = playlistSource,
             favoriteDao = database.favoriteDao(),
+            hiddenChannelDao = database.hiddenChannelDao(),
         )
     }
 

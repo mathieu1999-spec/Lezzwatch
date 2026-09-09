@@ -2,6 +2,8 @@ package com.lezzwatch.app.data.repository
 
 import com.lezzwatch.app.data.local.db.FavoriteDao
 import com.lezzwatch.app.data.local.db.FavoriteEntity
+import com.lezzwatch.app.data.local.db.HiddenChannelDao
+import com.lezzwatch.app.data.local.db.HiddenChannelEntity
 import com.lezzwatch.app.data.model.Channel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +19,8 @@ import kotlinx.coroutines.sync.withLock
 
 /**
  * Single source of truth for channel data: loads the playlist (once, lazily) via
- * [PlaylistSource] and continuously stitches in favorite status from Room, so every screen
- * observing [channels] automatically reflects favorite toggles anywhere else in the app.
+ * [PlaylistSource] and continuously stitches in favorite/hidden status from Room, so every screen
+ * observing [channels] automatically reflects favorite/hide toggles anywhere else in the app.
  *
  * This class is an app-scoped singleton (see [com.lezzwatch.app.di.AppContainer]) so the
  * playlist is parsed exactly once per process lifetime, not once per screen.
@@ -26,6 +28,7 @@ import kotlinx.coroutines.sync.withLock
 class ChannelRepository(
     private val playlistSource: PlaylistSource,
     private val favoriteDao: FavoriteDao,
+    private val hiddenChannelDao: HiddenChannelDao,
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val loadMutex = Mutex()
@@ -38,12 +41,24 @@ class ChannelRepository(
         .map { entities -> entities.map(FavoriteEntity::channelId).toSet() }
         .stateIn(repositoryScope, SharingStarted.Eagerly, emptySet())
 
-    /** All channels, each with an up-to-date [Channel.isFavorite] flag. */
-    val channels: StateFlow<List<Channel>> = combine(rawChannels, favoriteIds) { raw, favIds ->
-        raw.map { it.copy(isFavorite = it.id in favIds) }
+    private val hiddenIds: StateFlow<Set<String>> = hiddenChannelDao.observeHidden()
+        .map { entities -> entities.map(HiddenChannelEntity::channelId).toSet() }
+        .stateIn(repositoryScope, SharingStarted.Eagerly, emptySet())
+
+    /** Every channel from the playlist, each with up-to-date [Channel.isFavorite] and
+     * [Channel.isHidden] flags. Includes hidden channels — this is the list the Settings
+     * "Hidden Channels" screen manages. Everywhere else (browsing, search, the in-player channel
+     * switcher, favorites) should use [visibleChannels] instead. */
+    val channels: StateFlow<List<Channel>> = combine(rawChannels, favoriteIds, hiddenIds) { raw, favIds, hidden ->
+        raw.map { it.copy(isFavorite = it.id in favIds, isHidden = it.id in hidden) }
     }.stateIn(repositoryScope, SharingStarted.Eagerly, emptyList())
 
-    val favoriteChannels: StateFlow<List<Channel>> = channels.map { list -> list.filter { it.isFavorite } }
+    /** [channels] with hidden ones filtered out. */
+    val visibleChannels: StateFlow<List<Channel>> = channels
+        .map { list -> list.filterNot { it.isHidden } }
+        .stateIn(repositoryScope, SharingStarted.Eagerly, emptyList())
+
+    val favoriteChannels: StateFlow<List<Channel>> = visibleChannels.map { list -> list.filter { it.isFavorite } }
         .stateIn(repositoryScope, SharingStarted.Eagerly, emptyList())
 
     /** Parses the bundled playlist on first call; subsequent calls are no-ops. Safe to call from
@@ -69,6 +84,14 @@ class ChannelRepository(
     }
 
     suspend fun clearFavorites() = favoriteDao.clearAll()
+
+    suspend fun hideChannel(channel: Channel) {
+        hiddenChannelDao.add(HiddenChannelEntity(channel.id, System.currentTimeMillis()))
+    }
+
+    suspend fun unhideChannel(channel: Channel) {
+        hiddenChannelDao.remove(channel.id)
+    }
 
     fun findById(channelId: String): Channel? = channels.value.firstOrNull { it.id == channelId }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ fun ChannelCard(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
     showFavoriteButton: Boolean = true,
+    onHide: (() -> Unit)? = null,
 ) {
     Card(
         modifier = modifier
@@ -96,6 +98,16 @@ fun ChannelCard(
                             if (channel.isFavorite) R.string.player_unfavorite else R.string.player_favorite,
                         ),
                         tint = if (channel.isFavorite) FavoriteRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            if (onHide != null) {
+                IconButton(onClick = onHide) {
+                    Icon(
+                        imageVector = Icons.Filled.VisibilityOff,
+                        contentDescription = stringResource(R.string.channels_hide_channel),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }

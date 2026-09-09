@@ -12,6 +12,7 @@ import com.lezzwatch.app.data.repository.ChannelRepository
 import com.lezzwatch.app.di.appContainer
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -22,6 +23,10 @@ class SettingsViewModel(
 
     val preferences: StateFlow<UserPreferences> = preferencesRepository.preferences
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserPreferences())
+
+    val hiddenChannelCount: StateFlow<Int> = channelRepository.channels
+        .map { list -> list.count { it.isHidden } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     fun setTheme(theme: AppTheme) {
         viewModelScope.launch { preferencesRepository.setTheme(theme) }

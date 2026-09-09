@@ -28,6 +28,7 @@
     <string name="channels_select_all">Select all</string>
     <string name="channels_deselect_all">Deselect all</string>
     <string name="channels_results_count">%1$d channels</string>
+    <string name="channels_hide_channel">Hide channel</string>
 
     <!-- Sort options -->
     <string name="sort_az">A–Z</string>
@@ -82,6 +83,9 @@
     <string name="settings_clear_favorites_confirm_title">Clear all favorites?</string>
     <string name="settings_clear_favorites_confirm_body">This removes every channel from your favorites. This can\'t be undone.</string>
     <string name="settings_about">About Lezzwatch</string>
+    <string name="settings_hidden_channels">Hidden Channels</string>
+    <string name="settings_hidden_channels_empty">No hidden channels.</string>
+    <string name="settings_unhide">Unhide</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
 

@@ -118,6 +118,7 @@ fun ChannelsScreen(
                             channel = channel,
                             onClick = { onChannelSelected(channel) },
                             onToggleFavorite = { viewModel.toggleFavorite(channel) },
+                            onHide = { viewModel.hideChannel(channel) },
                         )
                     }
                 }

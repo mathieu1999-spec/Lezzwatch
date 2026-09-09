@@ -33,7 +33,7 @@ class ChannelsViewModel(
     private val filterState = MutableStateFlow(ChannelFilter())
 
     val uiState: StateFlow<ChannelsUiState> = combine(
-        channelRepository.channels,
+        channelRepository.visibleChannels,
         channelRepository.isLoaded,
         filterState,
     ) { channels, isLoaded, filter ->
@@ -89,6 +89,10 @@ class ChannelsViewModel(
 
     fun toggleFavorite(channel: Channel) {
         viewModelScope.launch { channelRepository.toggleFavorite(channel) }
+    }
+
+    fun hideChannel(channel: Channel) {
+        viewModelScope.launch { channelRepository.hideChannel(channel) }
     }
 
     private fun applyFilter(channels: List<Channel>, filter: ChannelFilter): List<Channel> {

@@ -44,10 +44,12 @@ import com.lezzwatch.app.data.model.SortOption
 fun SettingsScreen(
     onBack: () -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenHiddenChannels: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory),
 ) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
+    val hiddenChannelCount by viewModel.hiddenChannelCount.collectAsStateWithLifecycle()
     var showThemeMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showClearFavoritesDialog by remember { mutableStateOf(false) }
@@ -88,6 +90,14 @@ fun SettingsScreen(
                     }
                 }
             }
+            Divider(color = MaterialTheme.colorScheme.outline)
+
+            // Hidden channels
+            SettingsRow(
+                title = stringResource(R.string.settings_hidden_channels),
+                value = hiddenChannelCount.toString(),
+                onClick = onOpenHiddenChannels,
+            )
             Divider(color = MaterialTheme.colorScheme.outline)
 
             // Autoplay last channel

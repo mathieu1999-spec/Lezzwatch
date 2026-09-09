@@ -3,10 +3,10 @@ package com.lezzwatch.app.data.model
 /**
  * Domain model for a single IPTV channel.
  *
- * Instances are immutable; [isFavorite] is a derived flag stitched on by
+ * Instances are immutable; [isFavorite] and [isHidden] are derived flags stitched on by
  * [com.lezzwatch.app.data.repository.ChannelRepository] when it combines the parsed playlist
- * with the favorite IDs stored in Room, so the parser itself never needs to know about
- * favorites at all.
+ * with the favorite/hidden IDs stored in Room, so the parser itself never needs to know about
+ * either concept at all.
  */
 data class Channel(
     val id: String,
@@ -17,6 +17,7 @@ data class Channel(
     val genre: String,
     val group: String?,
     val isFavorite: Boolean = false,
+    val isHidden: Boolean = false,
 ) {
     companion object {
         const val UNKNOWN_COUNTRY = "International"

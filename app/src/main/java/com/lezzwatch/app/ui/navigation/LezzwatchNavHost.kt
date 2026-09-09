@@ -28,6 +28,7 @@ import com.lezzwatch.app.ui.about.AboutScreen
 import com.lezzwatch.app.ui.channels.ChannelsScreen
 import com.lezzwatch.app.ui.coffee.BuyMeACoffeeScreen
 import com.lezzwatch.app.ui.home.HomeScreen
+import com.lezzwatch.app.ui.settings.HiddenChannelsScreen
 import com.lezzwatch.app.ui.settings.SettingsScreen
 
 private data class BottomNavItem(val destination: Destination, val icon: androidx.compose.ui.graphics.vector.ImageVector, val labelRes: Int)
@@ -105,10 +106,14 @@ fun LezzwatchNavHost(onChannelSelected: (Channel) -> Unit) {
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
                     onOpenAbout = { navController.navigate(Destination.About.route) },
+                    onOpenHiddenChannels = { navController.navigate(Destination.HiddenChannels.route) },
                 )
             }
             composable(Destination.About.route) {
                 AboutScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Destination.HiddenChannels.route) {
+                HiddenChannelsScreen(onBack = { navController.popBackStack() })
             }
         }
     }
