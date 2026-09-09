@@ -14,8 +14,8 @@ android {
         // version-gated fallbacks, and covers well over 95% of active devices.
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.02"
+        versionCode = 4
+        versionName = "1.04"
 
         vectorDrawables {
             useSupportLibrary = true

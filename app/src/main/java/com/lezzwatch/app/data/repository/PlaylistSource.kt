@@ -14,6 +14,9 @@ import kotlinx.coroutines.withContext
  */
 interface PlaylistSource {
     suspend fun loadChannels(): List<Channel>
+
+    /** The playlist's declared EPG (XMLTV) URL, if any — see [M3UParser.extractEpgUrl]. */
+    suspend fun loadEpgUrl(): String?
 }
 
 /** Reads `assets/playlist.m3u`, bundled with the app. */
@@ -25,6 +28,12 @@ class AssetPlaylistSource(
     override suspend fun loadChannels(): List<Channel> = withContext(Dispatchers.IO) {
         context.assets.open(assetFileName).use { stream ->
             M3UParser.parse(stream)
+        }
+    }
+
+    override suspend fun loadEpgUrl(): String? = withContext(Dispatchers.IO) {
+        context.assets.open(assetFileName).use { stream ->
+            M3UParser.extractEpgUrl(stream)
         }
     }
 }

@@ -19,6 +19,23 @@ object M3UParser {
 
     private val extinfAttrRegex = Regex("""([a-zA-Z0-9_-]+)="([^"]*)"""")
     private val tvgIdCountryRegex = Regex("""\.([a-zA-Z]{2,3})@""")
+    private val epgUrlRegex = Regex("""(?:x-tvg-url|url-tvg)="([^"]*)"""")
+
+    /** Pulls the EPG (XMLTV) URL out of the playlist's `#EXTM3U` header, e.g.
+     * `#EXTM3U x-tvg-url="https://.../guide.xml.gz"` — the de facto standard IPTV playlists use to
+     * point at their programme guide. Returns null if the header carries no such attribute (most
+     * playlists don't). */
+    fun extractEpgUrl(input: InputStream): String? {
+        BufferedReader(InputStreamReader(input, Charsets.UTF_8)).useLines { lines ->
+            for (rawLine in lines) {
+                val line = rawLine.removePrefix("﻿").trim()
+                if (line.isEmpty()) continue
+                if (!line.startsWith("#EXTM3U")) return null
+                return epgUrlRegex.find(line)?.groupValues?.get(1)?.takeIf { it.isNotBlank() }
+            }
+        }
+        return null
+    }
 
     fun parse(input: InputStream): List<Channel> {
         val reader = BufferedReader(InputStreamReader(input, Charsets.UTF_8))

@@ -14,6 +14,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.lezzwatch.app.data.local.prefs.AppTheme
 import com.lezzwatch.app.ui.theme.LezzwatchTheme
 
@@ -42,6 +45,7 @@ class PlayerActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        hideSystemBars()
 
         if (channelId.isNullOrBlank()) {
             finish()
@@ -71,6 +75,7 @@ class PlayerActivity : FragmentActivity() {
         if (!isInPipModeState.value) {
             wasPlayingBeforeStop = playerViewModel.activePlayer.value.isPlaying
             playerViewModel.activePlayer.value.pause()
+            playerViewModel.stopRecording()
         }
     }
 
@@ -101,6 +106,22 @@ class PlayerActivity : FragmentActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         isInPipModeState.value = isInPictureInPictureMode
+    }
+
+    /** The system briefly reveals the status/nav bars on a swipe-in (by design, so the gesture
+     * still works) and after some system dialogs — re-hide them whenever the window regains
+     * focus so the player stays truly full-screen rather than leaving them stuck visible. */
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemBars()
+    }
+
+    private fun hideSystemBars() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     companion object {

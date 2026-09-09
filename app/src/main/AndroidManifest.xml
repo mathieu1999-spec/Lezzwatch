@@ -10,6 +10,13 @@
     <!-- Google Cast device discovery. -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
+    <!-- Needed only on Android 9 and below to save recordings into the public Movies directory;
+         10+ writes through MediaStore instead, which needs no permission for files the app
+         itself creates. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <!-- Keep the screen on while a stream is actively playing. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 

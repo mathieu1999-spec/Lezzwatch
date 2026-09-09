@@ -46,6 +46,11 @@
     <string name="player_channel_list">Channel list</string>
     <string name="player_channel_up">Next favorite channel</string>
     <string name="player_channel_down">Previous favorite channel</string>
+    <string name="player_start_recording">Start recording</string>
+    <string name="player_stop_recording">Stop recording</string>
+    <string name="player_lock_controls">Lock controls</string>
+    <string name="player_unlock_controls">Unlock controls</string>
+    <string name="player_epg_next">Next: %1$s</string>
     <string name="player_all_channels">All Channels</string>
     <string name="player_favorites">Favorites</string>
     <string name="player_favorite">Favorite</string>

@@ -5,6 +5,7 @@ import com.lezzwatch.app.data.local.db.LezzwatchDatabase
 import com.lezzwatch.app.data.local.prefs.UserPreferencesRepository
 import com.lezzwatch.app.data.repository.AssetPlaylistSource
 import com.lezzwatch.app.data.repository.ChannelRepository
+import com.lezzwatch.app.data.repository.EpgRepository
 
 /**
  * Small hand-rolled dependency container. The app is intentionally small enough that a full DI
@@ -18,12 +19,16 @@ class AppContainer(context: Context) {
 
     private val database by lazy { LezzwatchDatabase.getInstance(appContext) }
 
+    private val playlistSource by lazy { AssetPlaylistSource(appContext) }
+
     val userPreferencesRepository by lazy { UserPreferencesRepository(appContext) }
 
     val channelRepository by lazy {
         ChannelRepository(
-            playlistSource = AssetPlaylistSource(appContext),
+            playlistSource = playlistSource,
             favoriteDao = database.favoriteDao(),
         )
     }
+
+    val epgRepository by lazy { EpgRepository(playlistSource) }
 }
