@@ -33,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,14 +60,15 @@ fun ChannelCard(
     onHide: (() -> Unit)? = null,
 ) {
     var showHideMenu by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
-    // A deliberately long hold (well past the ~500ms system default for a long-press) so hiding a
-    // channel can never happen by accident — only this card's press-and-hold triggers it, taps
-    // and normal long-presses elsewhere in the app are unaffected.
+    // A slightly longer hold than the ~500ms system default for a long-press, so hiding a channel
+    // is a deliberate gesture rather than an accidental one — only this card's press-and-hold
+    // triggers it, taps and normal long-presses elsewhere in the app are unaffected.
     val longHoldViewConfiguration = LocalViewConfiguration.current.let { base ->
         remember(base) {
             object : androidx.compose.ui.platform.ViewConfiguration by base {
-                override val longPressTimeoutMillis: Long = 3_000L
+                override val longPressTimeoutMillis: Long = 1_000L
             }
         }
     }
@@ -77,7 +80,12 @@ fun ChannelCard(
                     .fillMaxWidth()
                     .combinedClickable(
                         onClick = onClick,
-                        onLongClick = onHide?.let { { showHideMenu = true } },
+                        onLongClick = onHide?.let {
+                            {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                showHideMenu = true
+                            }
+                        },
                     ),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(14.dp),

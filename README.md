@@ -77,6 +77,7 @@ The Cast integration uses Media3's `CastPlayer` (`androidx.media3:media3-cast`),
 - **Live-TV streams themselves**: playability of any individual channel in the playlist depends entirely on that stream still being online, geographically available, and reachable from the user's network — Lezzwatch is a player, not a stream host, and can't fix a dead upstream URL.
 - The app icon (`res/drawable/ic_launcher_*.xml`) is a simple placeholder vector mark. Swap in real brand artwork before shipping — Image Asset Studio in Android Studio (right-click `res` → New → Image Asset) is the easiest way to regenerate a full icon set from your own artwork.
 - `minSdk` is 26 (Android 8.0), chosen so `PictureInPictureParams.Builder` and adaptive icons are available without extra version-gating code, covering the large majority of active devices.
+- **⚠️ Before releasing, remove the About screen easter egg**: tapping the "Lezzwatch" title 10 times fast on the About screen (`ui/about/AboutScreen.kt`) shows a personal photo (`res/drawable/easter_egg_wedding.jpg`). Delete the tap-counter logic and the `Dialog` block in `AboutScreen.kt`, and remove `easter_egg_wedding.jpg`, before a public release.
 
 ## Architecture notes for extending the app
 
