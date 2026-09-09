@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -22,24 +24,35 @@ import com.lezzwatch.app.R
 import com.lezzwatch.app.data.model.SortOption
 
 /**
- * Dropdown-style filter chip: a compact FilterChip that opens a DropdownMenu of choices.
- * Used for both country and genre filters so the whole filter row stays a single, low-friction
- * line rather than a separate filter screen (spec: "avoid a complicated filter interface").
+ * Compact FilterChip that opens a DropdownMenu checklist for choosing multiple genres at once —
+ * any genre left unchecked is hidden from the Channels list. A "Select all / Deselect all" item
+ * pinned above the list is a single quick toggle between everything shown and everything hidden.
+ *
+ * [selectedGenres] `null` means every genre is selected (the default, unfiltered state).
  */
 @Composable
-fun FilterDropdownChip(
-    label: String,
-    selected: Boolean,
-    options: List<String>,
+fun GenreFilterChip(
+    selectedGenres: Set<String>?,
+    availableGenres: List<String>,
     allLabel: String,
-    onOptionSelected: (String?) -> Unit,
+    onGenreToggled: (String) -> Unit,
+    onToggleSelectAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val allSelected = selectedGenres == null || selectedGenres.size == availableGenres.size
+    val selectedCount = selectedGenres?.size ?: availableGenres.size
+
+    val label = when {
+        allSelected -> allLabel
+        selectedCount == 0 -> stringResource(R.string.channels_no_genres)
+        selectedCount == 1 -> selectedGenres!!.first()
+        else -> stringResource(R.string.channels_genres_selected_count, selectedCount)
+    }
 
     Box(modifier = modifier) {
         FilterChip(
-            selected = selected,
+            selected = !allSelected,
             onClick = { expanded = true },
             label = { Text(label) },
             trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null) },
@@ -51,13 +64,29 @@ fun FilterDropdownChip(
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
-                text = { Text(allLabel) },
-                onClick = { expanded = false; onOptionSelected(null) },
+                text = {
+                    Text(
+                        if (allSelected) {
+                            stringResource(R.string.channels_deselect_all)
+                        } else {
+                            stringResource(R.string.channels_select_all)
+                        },
+                    )
+                },
+                leadingIcon = {
+                    Checkbox(checked = allSelected, onCheckedChange = { onToggleSelectAll() })
+                },
+                onClick = onToggleSelectAll,
             )
-            options.forEach { option ->
+            Divider()
+            availableGenres.forEach { genre ->
+                val checked = selectedGenres?.contains(genre) ?: true
                 DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = { expanded = false; onOptionSelected(option) },
+                    text = { Text(genre) },
+                    leadingIcon = {
+                        Checkbox(checked = checked, onCheckedChange = { onGenreToggled(genre) })
+                    },
+                    onClick = { onGenreToggled(genre) },
                 )
             }
         }

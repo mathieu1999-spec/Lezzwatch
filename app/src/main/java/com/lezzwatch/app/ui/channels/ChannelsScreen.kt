@@ -31,7 +31,7 @@ import com.lezzwatch.app.data.model.Channel
 import com.lezzwatch.app.ui.components.ChannelCard
 import com.lezzwatch.app.ui.components.ChannelSearchField
 import com.lezzwatch.app.ui.components.EmptyState
-import com.lezzwatch.app.ui.components.FilterDropdownChip
+import com.lezzwatch.app.ui.components.GenreFilterChip
 import com.lezzwatch.app.ui.components.SortMenuButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,12 +70,12 @@ fun ChannelsScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    FilterDropdownChip(
-                        label = state.filter.genre ?: allGenresLabel,
-                        selected = state.filter.genre != null,
-                        options = state.availableGenres,
+                    GenreFilterChip(
+                        selectedGenres = state.filter.selectedGenres,
+                        availableGenres = state.availableGenres,
                         allLabel = allGenresLabel,
-                        onOptionSelected = viewModel::onGenreSelected,
+                        onGenreToggled = { genre -> viewModel.onGenreToggled(genre, state.availableGenres) },
+                        onToggleSelectAll = { viewModel.onToggleSelectAllGenres(state.availableGenres) },
                     )
                 }
 

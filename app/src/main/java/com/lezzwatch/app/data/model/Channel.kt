@@ -36,9 +36,14 @@ enum class SortOption {
     FAVORITES_FIRST,
 }
 
-/** Current filter + sort selection for the Channels screen, kept together so it's easy to persist. */
+/** Current filter + sort selection for the Channels screen, kept together so it's easy to persist.
+ *
+ * [selectedGenres] `null` means "no filter" (every genre shown) — the default state, and the
+ * canonical form once every available genre ends up individually selected again. A non-null set
+ * (including an empty one, meaning nothing is selected and every channel is hidden) is used once
+ * the user deselects at least one genre from the full set. */
 data class ChannelFilter(
     val query: String = "",
-    val genre: String? = null, // null = all genres
+    val selectedGenres: Set<String>? = null,
     val sortOption: SortOption = SortOption.NAME_ASC,
 )

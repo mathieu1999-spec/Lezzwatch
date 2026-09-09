@@ -105,7 +105,12 @@ fun PlayerScreen(
                         },
                     )
                     Spacer(Modifier.weight(1f))
-                    PlayerBottomBar(onOpenChannelList = { showChannelDrawer = true })
+                    PlayerBottomBar(
+                        onOpenChannelList = { showChannelDrawer = true },
+                        onChannelUp = viewModel::nextFavoriteChannel,
+                        onChannelDown = viewModel::previousFavoriteChannel,
+                        channelUpDownEnabled = allChannels.count { it.isFavorite } > 1,
+                    )
                 }
 
                 if (state.playbackState == PlaybackUiState.Ready) {

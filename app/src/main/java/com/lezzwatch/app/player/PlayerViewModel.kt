@@ -99,6 +99,21 @@ class PlayerViewModel(
 
     fun retry() = playChannel(_currentChannelId.value)
 
+    /** TV-remote-style channel up/down: cycles through the user's favorite channels only (not
+     * the full channel list), wrapping around at either end. No-ops when there are no favorites,
+     * or advances to the first/last favorite when the current channel isn't one itself. */
+    fun nextFavoriteChannel() = cycleFavoriteChannel(step = 1)
+
+    fun previousFavoriteChannel() = cycleFavoriteChannel(step = -1)
+
+    private fun cycleFavoriteChannel(step: Int) {
+        val favorites = allChannels.value.filter { it.isFavorite }
+        if (favorites.isEmpty()) return
+        val currentIndex = favorites.indexOfFirst { it.id == _currentChannelId.value }
+        val nextIndex = if (currentIndex == -1) 0 else (currentIndex + step).mod(favorites.size)
+        selectChannel(favorites[nextIndex].id)
+    }
+
     fun toggleFavorite() {
         uiState.value.channel?.let(::toggleFavoriteFor)
     }

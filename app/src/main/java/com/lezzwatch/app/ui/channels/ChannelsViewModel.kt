@@ -57,8 +57,26 @@ class ChannelsViewModel(
         filterState.value = filterState.value.copy(query = query)
     }
 
-    fun onGenreSelected(genre: String?) {
-        filterState.value = filterState.value.copy(genre = genre)
+    /** Toggles a single genre in/out of the current selection. [availableGenres] is passed in
+     * (rather than read from [uiState]) so the caller's already-observed, up-to-date list is used
+     * instead of risking a stale snapshot. */
+    fun onGenreToggled(genre: String, availableGenres: List<String>) {
+        val current = filterState.value.selectedGenres
+        val effective = current ?: availableGenres.toSet()
+        val updated = if (genre in effective) effective - genre else effective + genre
+        filterState.value = filterState.value.copy(
+            selectedGenres = if (updated.size == availableGenres.size) null else updated,
+        )
+    }
+
+    /** Quick toggle: selects every genre if not all are already selected, otherwise deselects
+     * every genre (hiding all channels) — a single button flips between the two extremes. */
+    fun onToggleSelectAllGenres(availableGenres: List<String>) {
+        val current = filterState.value.selectedGenres
+        val allSelected = current == null || current.size == availableGenres.size
+        filterState.value = filterState.value.copy(
+            selectedGenres = if (allSelected) emptySet() else null,
+        )
     }
 
     fun onSortSelected(sortOption: SortOption) {
@@ -80,8 +98,8 @@ class ChannelsViewModel(
             val q = filter.query.trim()
             result = result.filter { it.name.contains(q, ignoreCase = true) }
         }
-        if (filter.genre != null) {
-            result = result.filter { it.genre == filter.genre }
+        if (filter.selectedGenres != null) {
+            result = result.filter { it.genre in filter.selectedGenres }
         }
 
         result = when (filter.sortOption) {

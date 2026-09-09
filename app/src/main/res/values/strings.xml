@@ -23,6 +23,10 @@
     <string name="channels_empty">No channels match your filters.</string>
     <string name="channels_clear_filters">Clear filters</string>
     <string name="channels_all_genres">All Genres</string>
+    <string name="channels_no_genres">No Genres</string>
+    <string name="channels_genres_selected_count">%1$d Genres</string>
+    <string name="channels_select_all">Select all</string>
+    <string name="channels_deselect_all">Deselect all</string>
     <string name="channels_results_count">%1$d channels</string>
 
     <!-- Sort options -->
@@ -40,6 +44,8 @@
     <string name="player_back_to_channels">Back to Channels</string>
     <string name="player_no_network">No internet connection.</string>
     <string name="player_channel_list">Channel list</string>
+    <string name="player_channel_up">Next favorite channel</string>
+    <string name="player_channel_down">Previous favorite channel</string>
     <string name="player_all_channels">All Channels</string>
     <string name="player_favorites">Favorites</string>
     <string name="player_favorite">Favorite</string>

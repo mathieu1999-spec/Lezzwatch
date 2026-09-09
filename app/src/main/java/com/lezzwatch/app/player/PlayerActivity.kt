@@ -7,10 +7,10 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,8 +22,13 @@ import com.lezzwatch.app.ui.theme.LezzwatchTheme
  * constrained by the bottom navigation"). Kept separate from [com.lezzwatch.app.MainActivity] so
  * Picture-in-Picture, orientation handling, and the immersive video surface all have a clean,
  * isolated Activity lifecycle instead of fighting with the bottom-nav host.
+ *
+ * Extends [FragmentActivity] (rather than the plain [androidx.activity.ComponentActivity] most of
+ * the app's Compose activities use) because Google's Cast [androidx.mediarouter.app.MediaRouteButton]
+ * requires a `FragmentActivity` to show its device-picker dialog — without it, tapping the Cast
+ * button throws `IllegalStateException` and crashes the app.
  */
-class PlayerActivity : ComponentActivity() {
+class PlayerActivity : FragmentActivity() {
 
     private val channelId: String? by lazy { intent.getStringExtra(EXTRA_CHANNEL_ID) }
 

@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureInPicture
@@ -112,20 +115,77 @@ fun PlayPauseButton(isPlaying: Boolean, onToggle: () -> Unit, modifier: Modifier
     }
 }
 
-/** Bottom overlay: button to open the channel-switcher sheet. */
+/** Bottom overlay: TV-remote-style channel up/down cluster (cycles through favorites) on the
+ * left, button to open the channel-switcher sheet on the right. */
 @Composable
-fun PlayerBottomBar(onOpenChannelList: () -> Unit, modifier: Modifier = Modifier) {
+fun PlayerBottomBar(
+    onOpenChannelList: () -> Unit,
+    onChannelUp: () -> Unit,
+    onChannelDown: () -> Unit,
+    channelUpDownEnabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(GradientScrimBottom)
             .padding(12.dp),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        ChannelUpDownControls(
+            enabled = channelUpDownEnabled,
+            onChannelUp = onChannelUp,
+            onChannelDown = onChannelDown,
+        )
+
         androidx.compose.material3.FilledTonalButton(onClick = onOpenChannelList) {
             Icon(Icons.Filled.List, contentDescription = null, modifier = Modifier.size(18.dp))
             androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
             Text(stringResource(R.string.player_channel_list))
+        }
+    }
+}
+
+/** Two stacked chevrons resembling a TV remote's channel up/down rocker. Cycles through the
+ * user's favorite channels only — disabled (dimmed) when there are fewer than two to switch
+ * between. */
+@Composable
+private fun ChannelUpDownControls(
+    enabled: Boolean,
+    onChannelUp: () -> Unit,
+    onChannelDown: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(24.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IconButton(
+            onClick = onChannelUp,
+            enabled = enabled,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = Color.White,
+                disabledContentColor = Color.White.copy(alpha = 0.3f),
+            ),
+        ) {
+            Icon(
+                Icons.Filled.KeyboardArrowUp,
+                contentDescription = stringResource(R.string.player_channel_up),
+            )
+        }
+        IconButton(
+            onClick = onChannelDown,
+            enabled = enabled,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = Color.White,
+                disabledContentColor = Color.White.copy(alpha = 0.3f),
+            ),
+        ) {
+            Icon(
+                Icons.Filled.KeyboardArrowDown,
+                contentDescription = stringResource(R.string.player_channel_down),
+            )
         }
     }
 }
