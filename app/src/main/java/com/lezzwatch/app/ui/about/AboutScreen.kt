@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -45,10 +47,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.lezzwatch.app.BuildConfig
 import com.lezzwatch.app.R
 import com.lezzwatch.app.util.Constants
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun AboutScreen(onBack: () -> Unit, onOpenAdvancedSettings: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     // Easter egg: 10 taps on the app name within a fast cadence reveals a hidden picture. A tap
@@ -57,6 +60,7 @@ fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     var tapCount by remember { mutableIntStateOf(0) }
     var lastTapAtMillis by remember { mutableLongStateOf(0L) }
     var showEasterEgg by remember { mutableStateOf(false) }
+    var showAdvancedSettingsWarning by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -94,6 +98,16 @@ fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                         showEasterEgg = true
                     }
                 },
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.advanced_settings_title),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { showAdvancedSettingsWarning = true },
             )
             Spacer(Modifier.height(4.dp))
             Text(
@@ -148,7 +162,55 @@ fun AboutScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             }
         }
     }
+
+    if (showAdvancedSettingsWarning) {
+        AdvancedSettingsWarningDialog(
+            onConfirm = {
+                showAdvancedSettingsWarning = false
+                onOpenAdvancedSettings()
+            },
+            onDismiss = { showAdvancedSettingsWarning = false },
+        )
+    }
+}
+
+/**
+ * Both buttons stay disabled for [WARNING_DIALOG_DELAY_SECONDS] so the user can't tap or
+ * back-button their way past the warning before reading it — including via [AlertDialog]'s
+ * outside-tap dismiss, which is why `onDismissRequest` also checks the countdown.
+ */
+@Composable
+private fun AdvancedSettingsWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    var secondsRemaining by remember { mutableIntStateOf(WARNING_DIALOG_DELAY_SECONDS) }
+    LaunchedEffect(Unit) {
+        while (secondsRemaining > 0) {
+            delay(1_000)
+            secondsRemaining--
+        }
+    }
+    val canDismiss = secondsRemaining <= 0
+
+    AlertDialog(
+        onDismissRequest = { if (canDismiss) onDismiss() },
+        title = { Text(stringResource(R.string.advanced_settings_warning_title)) },
+        text = { Text(stringResource(R.string.advanced_settings_warning_body)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm, enabled = canDismiss) {
+                Text(
+                    if (canDismiss) {
+                        stringResource(R.string.confirm)
+                    } else {
+                        stringResource(R.string.advanced_settings_warning_wait, secondsRemaining)
+                    },
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = canDismiss) { Text(stringResource(R.string.cancel)) }
+        },
+    )
 }
 
 private const val EASTER_EGG_TAP_COUNT = 10
 private const val EASTER_EGG_TAP_WINDOW_MILLIS = 500L
+private const val WARNING_DIALOG_DELAY_SECONDS = 4

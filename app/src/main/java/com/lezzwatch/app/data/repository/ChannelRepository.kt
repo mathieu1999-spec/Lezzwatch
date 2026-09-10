@@ -61,15 +61,26 @@ class ChannelRepository(
     val favoriteChannels: StateFlow<List<Channel>> = visibleChannels.map { list -> list.filter { it.isFavorite } }
         .stateIn(repositoryScope, SharingStarted.Eagerly, emptyList())
 
-    /** Parses the bundled playlist on first call; subsequent calls are no-ops. Safe to call from
-     * multiple screens concurrently on app start. */
+    /** Parses the playlist on first call; subsequent calls are no-ops. Safe to call from multiple
+     * screens concurrently on app start. */
     suspend fun ensureLoaded() {
         if (loaded.value) return
         loadMutex.withLock {
             if (loaded.value) return
-            rawChannels.value = playlistSource.loadChannels()
-            loaded.value = true
+            loadInternal()
         }
+    }
+
+    /** Re-parses the playlist from [playlistSource] regardless of whether it was already loaded —
+     * used after Advanced Settings changes which playlist is active, since that's a runtime
+     * preference change rather than something the app only reads once at startup. */
+    suspend fun reload() {
+        loadMutex.withLock { loadInternal() }
+    }
+
+    private suspend fun loadInternal() {
+        rawChannels.value = playlistSource.loadChannels()
+        loaded.value = true
     }
 
     fun availableGenres(): List<String> =

@@ -2471,3 +2471,20 @@ https://amg17931-zee-amg17931c6-samsung-au-8872.playouts.now.amagi.tv/playlist/a
 https://media.slactech.com:1936/ZIZDirect/ZIZDirect/playlist.m3u8
 #EXTINF:-1 tvg-id="ZNSTV.bs@SD" tvg-logo="https://i.imgur.com/h6nC8fe.png" group-title="English",ZNS-TV (1080p)
 https://zns-edge1.streamcomedia.cloud/znstv13/zns1080p_stream/playlist.m3u8
+
+#EXTINF:-1 group-title="English",CBS Sports Golazo Network (720p)
+https://dai.google.com/linear/hls/event/7f3Wv6f7QEKfQna22jHqLQ/master.m3u8
+#EXTINF:-1 group-title="English",Cheers
+https://jmp2.uk/plu-62bdb7f0db2eb30007376d4d.m3u8
+#EXTINF:-1 group-title="English",Cine aventura
+https://jmp2.uk/plu-60fb2f47c133270007327375.m3u8
+#EXTINF:-1 group-title="English",NBA TV (1080p)
+https://cdn1.ayitistream.com/NBATV/index.m3u8
+#EXTINF:-1 group-title="English",Overcomers TV (720p)
+https://glorystartv.live/Overcomers/index.m3u8
+#EXTINF:-1 group-title="English",Placid (1080p) [Not 24/7]
+https://toy.vcdn.fyi/placid/index.m3u8
+#EXTINF:-1 group-title="English",Sangat TV (576p)
+https://mumt06.tangotv.in/qYyB8fXVSANGATTV/index.m3u8
+#EXTINF:-1 group-title="English",Sky Nature (576p)
+https://tvsen6.aynaott.com/skynature/index.m3u8

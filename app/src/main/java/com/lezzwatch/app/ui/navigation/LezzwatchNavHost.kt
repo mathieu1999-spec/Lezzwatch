@@ -28,6 +28,7 @@ import com.lezzwatch.app.ui.about.AboutScreen
 import com.lezzwatch.app.ui.channels.ChannelsScreen
 import com.lezzwatch.app.ui.coffee.BuyMeACoffeeScreen
 import com.lezzwatch.app.ui.home.HomeScreen
+import com.lezzwatch.app.ui.settings.AdvancedSettingsScreen
 import com.lezzwatch.app.ui.settings.HiddenChannelsScreen
 import com.lezzwatch.app.ui.settings.SettingsScreen
 
@@ -110,10 +111,16 @@ fun LezzwatchNavHost(onChannelSelected: (Channel) -> Unit) {
                 )
             }
             composable(Destination.About.route) {
-                AboutScreen(onBack = { navController.popBackStack() })
+                AboutScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenAdvancedSettings = { navController.navigate(Destination.AdvancedSettings.route) },
+                )
             }
             composable(Destination.HiddenChannels.route) {
                 HiddenChannelsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Destination.AdvancedSettings.route) {
+                AdvancedSettingsScreen(onBack = { navController.popBackStack() })
             }
         }
     }

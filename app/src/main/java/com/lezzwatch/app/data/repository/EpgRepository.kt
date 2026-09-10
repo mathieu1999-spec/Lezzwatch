@@ -30,15 +30,25 @@ class EpgRepository(private val playlistSource: PlaylistSource) {
         if (loaded) return
         loadMutex.withLock {
             if (loaded) return
-            programmesByChannel = try {
-                val url = playlistSource.loadEpgUrl()
-                if (url != null) withContext(Dispatchers.IO) { fetchAndParse(url) } else emptyMap()
-            } catch (e: Exception) {
-                Log.w(TAG, "EPG unavailable: ${e.message}")
-                emptyMap()
-            }
-            loaded = true
+            loadInternal()
         }
+    }
+
+    /** Re-fetches the guide for whichever playlist is now active — used after Advanced Settings
+     * changes the playlist, so a stale guide from the previous one isn't kept around. */
+    suspend fun reload() {
+        loadMutex.withLock { loadInternal() }
+    }
+
+    private suspend fun loadInternal() {
+        programmesByChannel = try {
+            val url = playlistSource.loadEpgUrl()
+            if (url != null) withContext(Dispatchers.IO) { fetchAndParse(url) } else emptyMap()
+        } catch (e: Exception) {
+            Log.w(TAG, "EPG unavailable: ${e.message}")
+            emptyMap()
+        }
+        loaded = true
     }
 
     /** The programme airing right now and the one immediately after it, for [channelId]. Either

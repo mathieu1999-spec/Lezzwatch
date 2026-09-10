@@ -1,16 +1,21 @@
 package com.lezzwatch.app.data.repository
 
 import android.content.Context
+import android.net.Uri
+import com.lezzwatch.app.data.local.prefs.PlaylistMode
+import com.lezzwatch.app.data.local.prefs.UserPreferencesRepository
 import com.lezzwatch.app.data.model.Channel
 import com.lezzwatch.app.data.parser.M3UParser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
 
 /**
- * Abstracts *where* the playlist comes from. Today there's a single implementation that reads
- * the bundled asset, but this seam is what lets a future version add a remote-URL playlist
- * (download + cache + fall back to the bundled copy) without touching [ChannelRepository],
- * the parser, or any UI code — see requirement 21 (Future Updates) in the product spec.
+ * Abstracts *where* the playlist comes from, so [ChannelRepository]/[EpgRepository] and every UI
+ * screen only ever depend on this interface, never on assets/files/preferences directly.
  */
 interface PlaylistSource {
     suspend fun loadChannels(): List<Channel>
@@ -19,40 +24,51 @@ interface PlaylistSource {
     suspend fun loadEpgUrl(): String?
 }
 
-/** Reads `assets/playlist.m3u`, bundled with the app. */
-class AssetPlaylistSource(
+/**
+ * Reads from whichever source the user has configured in Advanced Settings (see
+ * [PlaylistFileStore], [UserPreferencesRepository.setPlaylistMode]): the `assets/playlist.m3u`
+ * bundled with the app by default, a playlist the user imported themselves, or nothing at all if
+ * they removed the bundled one without replacing it.
+ */
+class ConfigurablePlaylistSource(
     private val context: Context,
+    private val preferencesRepository: UserPreferencesRepository,
+    private val playlistFileStore: PlaylistFileStore,
     private val assetFileName: String = "playlist.m3u",
 ) : PlaylistSource {
 
     override suspend fun loadChannels(): List<Channel> = withContext(Dispatchers.IO) {
-        context.assets.open(assetFileName).use { stream ->
-            M3UParser.parse(stream)
-        }
+        openStream()?.use { M3UParser.parse(it) } ?: emptyList()
     }
 
     override suspend fun loadEpgUrl(): String? = withContext(Dispatchers.IO) {
-        context.assets.open(assetFileName).use { stream ->
-            M3UParser.extractEpgUrl(stream)
-        }
+        openStream()?.use { M3UParser.extractEpgUrl(it) }
     }
+
+    private suspend fun openStream(): InputStream? =
+        when (preferencesRepository.preferences.first().playlistMode) {
+            PlaylistMode.REMOVED -> null
+            PlaylistMode.CUSTOM -> playlistFileStore.file.takeIf { it.exists() }?.inputStream()
+            PlaylistMode.BUNDLED -> context.assets.open(assetFileName)
+        }
 }
 
 /**
- * Sketch of how a future remote playlist source would slot in, left unused for now per the
- * "don't implement future features, just leave room for them" instruction:
- *
- * ```
- * class RemotePlaylistSource(
- *     private val url: String,
- *     private val httpClient: SomeHttpClient,
- *     private val fallback: PlaylistSource,
- * ) : PlaylistSource {
- *     override suspend fun loadChannels(): List<Channel> = try {
- *         M3UParser.parse(httpClient.openStream(url))
- *     } catch (e: IOException) {
- *         fallback.loadChannels()
- *     }
- * }
- * ```
+ * Holds the on-device copy of a playlist the user imported via Advanced Settings, so it survives
+ * process death without needing a persisted SAF permission on the original document URI.
  */
+class PlaylistFileStore(private val context: Context) {
+
+    val file: File get() = File(context.filesDir, "custom_playlist.m3u")
+
+    /** Copies the picked document into app-private storage. Throws on I/O failure so the caller
+     * can surface an error instead of silently switching to a playlist that isn't actually there. */
+    suspend fun import(uri: Uri) = withContext(Dispatchers.IO) {
+        val input = context.contentResolver.openInputStream(uri) ?: throw IOException("Unable to open file")
+        input.use { source -> file.outputStream().use { output -> source.copyTo(output) } }
+    }
+
+    suspend fun clear() = withContext(Dispatchers.IO) {
+        file.delete()
+    }
+}

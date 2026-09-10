@@ -42,7 +42,9 @@ app/src/main/java/com/lezzwatch/app/
 
 ### 1. The playlist
 
-The bundled playlist lives at **`app/src/main/assets/playlist.m3u`**. To ship your own channels, replace that file with your own `.m3u`/`.m3u8` file (keep the filename `playlist.m3u`, or change the filename passed to `AssetPlaylistSource` in `di/AppContainer.kt`). The parser (`data/parser/M3UParser.kt`) reads standard `#EXTINF` attributes — `tvg-id`, `tvg-name`, `tvg-logo`, `group-title` — and is tolerant of missing/malformed entries, so most real-world playlists will drop in without changes.
+The bundled playlist lives at **`app/src/main/assets/playlist.m3u`**. To ship your own channels, replace that file with your own `.m3u`/`.m3u8` file (keep the filename `playlist.m3u`, or change the filename passed to `ConfigurablePlaylistSource` in `di/AppContainer.kt`). The parser (`data/parser/M3UParser.kt`) reads standard `#EXTINF` attributes — `tvg-id`, `tvg-name`, `tvg-logo`, `group-title` — and is tolerant of missing/malformed entries, so most real-world playlists will drop in without changes.
+
+End users can also manage the playlist themselves at runtime, without a rebuild: **About Lezzwatch → Advanced Settings** (gated behind a warning dialog) lets them import their own `.m3u`/`.m3u8` file or remove the bundled one entirely. See "Runtime playlist management" below.
 
 The app only ever bundles the playlist you give it — Lezzwatch itself contains no channel URLs of its own and doesn't attempt to work around geo-blocking, DRM, or authentication on any stream.
 
@@ -81,7 +83,8 @@ The Cast integration uses Media3's `CastPlayer` (`androidx.media3:media3-cast`),
 
 ## Architecture notes for extending the app
 
-- **Swapping in a remote playlist later**: `data/repository/PlaylistSource.kt` is the seam — implement the interface with a network-backed version (download → parse → fall back to the bundled asset on failure) and wire it into `AppContainer` instead of `AssetPlaylistSource`. Nothing else in the app needs to change, since `ChannelRepository` only depends on the `PlaylistSource` interface.
+- **Swapping in a remote playlist later**: `data/repository/PlaylistSource.kt` is the seam — implement the interface with a network-backed version (download → parse → fall back to the bundled asset on failure) and wire it into `AppContainer` instead of `ConfigurablePlaylistSource`. Nothing else in the app needs to change, since `ChannelRepository` only depends on the `PlaylistSource` interface.
+- **Runtime playlist management**: `ConfigurablePlaylistSource` reads from one of three places, selected by the `PlaylistMode` preference (`data/local/prefs/UserPreferencesRepository.kt`) — the bundled asset (`BUNDLED`, default), a file the user picked via the system document picker and that got copied into app-private storage by `PlaylistFileStore` (`CUSTOM`), or nothing at all (`REMOVED`, an empty channel list). The UI for switching between these is `ui/settings/AdvancedSettingsScreen.kt`, reached from a warning dialog in `ui/about/AboutScreen.kt` that disables both its buttons for 4 seconds so users can't tap past it without reading it. Changing the mode calls `ChannelRepository.reload()`/`EpgRepository.reload()` so the change is reflected immediately, with no app restart needed.
 - **EPG, multiple playlists, recently-watched, parental controls**: none of these are implemented, but the layering (repository → ViewModel → Compose screen, with Room for structured local data and DataStore for settings) is meant to make each of these additive rather than requiring a rewrite.
 - **Favorites** live in Room (`data/local/db`); **settings** (theme, autoplay-last-channel, default sort, last-watched channel id) live in DataStore Preferences (`data/local/prefs`). Both persist across app restarts, device reboots, and app updates.
 - Dependency injection is a small hand-rolled container (`di/AppContainer.kt`) rather than Hilt/Koin — the app is small enough that a DI framework would be pure overhead. ViewModels get their dependencies via `viewModelFactory { initializer { ... } }`, the officially supported non-framework pattern.

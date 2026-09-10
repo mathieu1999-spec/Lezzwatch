@@ -14,11 +14,19 @@ private val Context.dataStore by preferencesDataStore(name = "lezzwatch_prefs")
 
 enum class AppTheme { SYSTEM, LIGHT, DARK }
 
+/**
+ * Which playlist [com.lezzwatch.app.data.repository.ConfigurablePlaylistSource] should read from.
+ * Changed only from the Advanced Settings screen, which is gated behind a warning dialog since
+ * REMOVED/CUSTOM can leave the app with no channels or a broken playlist.
+ */
+enum class PlaylistMode { BUNDLED, CUSTOM, REMOVED }
+
 data class UserPreferences(
     val theme: AppTheme = AppTheme.DARK,
     val autoPlayLastChannel: Boolean = false,
     val defaultSortOption: SortOption = SortOption.NAME_ASC,
     val lastWatchedChannelId: String? = null,
+    val playlistMode: PlaylistMode = PlaylistMode.BUNDLED,
 )
 
 /**
@@ -33,6 +41,7 @@ class UserPreferencesRepository(private val context: Context) {
         val AUTOPLAY_LAST = booleanPreferencesKey("autoplay_last_channel")
         val DEFAULT_SORT = stringPreferencesKey("default_sort_option")
         val LAST_CHANNEL_ID = stringPreferencesKey("last_watched_channel_id")
+        val PLAYLIST_MODE = stringPreferencesKey("playlist_mode")
     }
 
     val preferences: Flow<UserPreferences> = context.dataStore.data.map { prefs: Preferences ->
@@ -44,6 +53,9 @@ class UserPreferencesRepository(private val context: Context) {
                 ?.let { runCatching { SortOption.valueOf(it) }.getOrNull() }
                 ?: SortOption.NAME_ASC,
             lastWatchedChannelId = prefs[Keys.LAST_CHANNEL_ID],
+            playlistMode = prefs[Keys.PLAYLIST_MODE]
+                ?.let { runCatching { PlaylistMode.valueOf(it) }.getOrNull() }
+                ?: PlaylistMode.BUNDLED,
         )
     }
 
@@ -63,5 +75,9 @@ class UserPreferencesRepository(private val context: Context) {
         context.dataStore.edit {
             if (channelId == null) it.remove(Keys.LAST_CHANNEL_ID) else it[Keys.LAST_CHANNEL_ID] = channelId
         }
+    }
+
+    suspend fun setPlaylistMode(mode: PlaylistMode) {
+        context.dataStore.edit { it[Keys.PLAYLIST_MODE] = mode.name }
     }
 }
