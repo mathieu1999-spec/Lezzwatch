@@ -1,7 +1,5 @@
 package com.lezzwatch.app.ui.about
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,14 +43,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.lezzwatch.app.BuildConfig
 import com.lezzwatch.app.R
-import com.lezzwatch.app.util.Constants
+import com.lezzwatch.app.ui.coffee.GCashPaymentDialog
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack: () -> Unit, onOpenAdvancedSettings: () -> Unit, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-
     // Easter egg: 10 taps on the app name within a fast cadence reveals a hidden picture. A tap
     // that arrives slower than the window resets the count instead of just failing to increment,
     // so a hesitant tap sequence doesn't accidentally carry over into a later, unrelated one.
@@ -61,6 +56,7 @@ fun AboutScreen(onBack: () -> Unit, onOpenAdvancedSettings: () -> Unit, modifier
     var lastTapAtMillis by remember { mutableLongStateOf(0L) }
     var showEasterEgg by remember { mutableStateOf(false) }
     var showAdvancedSettingsWarning by remember { mutableStateOf(false) }
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -128,9 +124,7 @@ fun AboutScreen(onBack: () -> Unit, onOpenAdvancedSettings: () -> Unit, modifier
             )
             Spacer(Modifier.height(24.dp))
             TextButton(
-                onClick = {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constants.SUPPORT_URL)))
-                },
+                onClick = { showPaymentDialog = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.coffee_button))
@@ -171,6 +165,10 @@ fun AboutScreen(onBack: () -> Unit, onOpenAdvancedSettings: () -> Unit, modifier
             },
             onDismiss = { showAdvancedSettingsWarning = false },
         )
+    }
+
+    if (showPaymentDialog) {
+        GCashPaymentDialog(onDismiss = { showPaymentDialog = false })
     }
 }
 

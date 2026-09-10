@@ -69,6 +69,9 @@
     <string name="coffee_body">Lezzwatch is free to use, with no mandatory subscription. If you enjoy the app and want to help keep it free, you can support development by buying me a coffee.</string>
     <string name="coffee_button">Buy Me a Coffee</string>
     <string name="coffee_footnote">Totally optional — Lezzwatch works exactly the same either way. Thank you for using the app!</string>
+    <string name="coffee_gcash_title">Scan to Support via GCash</string>
+    <string name="coffee_gcash_body">Open GCash, Maya, or your banking app and scan this code (InstaPay) to send a tip.</string>
+    <string name="coffee_gcash_qr_cd">GCash payment QR code</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

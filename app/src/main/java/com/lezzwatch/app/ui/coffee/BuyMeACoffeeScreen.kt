@@ -1,7 +1,5 @@
 package com.lezzwatch.app.ui.coffee
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,20 +24,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.lezzwatch.app.R
-import com.lezzwatch.app.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyMeACoffeeScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -94,10 +94,7 @@ fun BuyMeACoffeeScreen(modifier: Modifier = Modifier) {
             Spacer(Modifier.height(28.dp))
 
             Button(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Constants.SUPPORT_URL))
-                    context.startActivity(intent)
-                },
+                onClick = { showPaymentDialog = true },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Filled.Coffee, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -114,5 +111,9 @@ fun BuyMeACoffeeScreen(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+
+    if (showPaymentDialog) {
+        GCashPaymentDialog(onDismiss = { showPaymentDialog = false })
     }
 }
